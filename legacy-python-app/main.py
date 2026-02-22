@@ -28,6 +28,10 @@ class Pomodoro:
         self.remaining_time_ms = int(self.durations[self.WORK] * 60 * 1000)
         self.timer_job = None
 
+        # Data store for tasks
+        # Each task: {"name": str, "est": int, "completed": int}
+        self.tasks = []
+
         # UI Components
         self.setup_ui()
 
@@ -38,7 +42,19 @@ class Pomodoro:
 
     def setup_ui(self):
         """Set up the UI components."""
-        self.frame = tk.Frame(self.root, width=450, height=450)
+        self.root.geometry("750x550")
+        
+        # Split into left (Timer) and right (Tasks) frames
+        self.left_frame = tk.Frame(self.root, width=450, height=550)
+        self.left_frame.pack(side=tk.LEFT, fill="both", expand=True)
+
+        self.right_frame = tk.Frame(self.root, width=300, height=550, bg="#f0f0f0")
+        self.right_frame.pack(side=tk.RIGHT, fill="both", expand=True)
+
+        # ----------------
+        # Left Frame: Timer
+        # ----------------
+        self.frame = tk.Frame(self.left_frame)
         self.frame.pack(fill="both", expand=True)
 
         # Settings Options
@@ -80,6 +96,71 @@ class Pomodoro:
 
         self.progress_label = tk.Label(self.frame, text="Pomodoros Completed: 0", font=("Arial", 12), fg="blue")
         self.progress_label.pack(pady=5)
+
+        # ----------------
+        # Right Frame: Task Tracker
+        # ----------------
+        tk.Label(self.right_frame, text="Task Tracker 📋", font=("Arial", 16, "bold"), bg="#f0f0f0").pack(pady=10)
+
+        # Add Task Section
+        add_frame = tk.Frame(self.right_frame, bg="#f0f0f0")
+        add_frame.pack(pady=5, fill="x", padx=10)
+        
+        tk.Label(add_frame, text="Task:", bg="#f0f0f0").grid(row=0, column=0, sticky="w")
+        self.task_name_var = tk.StringVar()
+        tk.Entry(add_frame, textvariable=self.task_name_var, width=15).grid(row=0, column=1, padx=5)
+
+        tk.Label(add_frame, text="Est. Poms:", bg="#f0f0f0").grid(row=1, column=0, sticky="w", pady=5)
+        self.task_est_var = tk.IntVar(value=1)
+        tk.Spinbox(add_frame, from_=1, to=20, textvariable=self.task_est_var, width=5).grid(row=1, column=1, sticky="w", padx=5)
+
+        tk.Button(add_frame, text="Add Task", command=self.add_task).grid(row=2, column=0, columnspan=2, pady=10)
+
+        # Task List
+        list_frame = tk.Frame(self.right_frame, bg="#f0f0f0")
+        list_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        
+        # Scrollbar and Listbox
+        scrollbar = tk.Scrollbar(list_frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.task_listbox = tk.Listbox(list_frame, yscrollcommand=scrollbar.set, font=("Arial", 12), selectbackground="#4682B4")
+        self.task_listbox.pack(side=tk.LEFT, fill="both", expand=True)
+        scrollbar.config(command=self.task_listbox.yview)
+
+        # Action Buttons
+        btn_frame = tk.Frame(self.right_frame, bg="#f0f0f0")
+        btn_frame.pack(pady=10)
+        tk.Button(btn_frame, text="Delete Selected", command=self.delete_task).pack()
+
+    def add_task(self):
+        name = self.task_name_var.get().strip()
+        est = self.task_est_var.get()
+        if not name:
+            messagebox.showwarning("Warning", "Task name cannot be empty.")
+            return
+        if est < 1:
+            messagebox.showwarning("Warning", "Estimated pomodoros must be at least 1.")
+            return
+
+        self.tasks.append({"name": name, "est": est, "completed": 0})
+        self.update_task_listbox()
+        self.task_name_var.set("")
+        self.task_est_var.set(1)
+
+    def delete_task(self):
+        selected = self.task_listbox.curselection()
+        if not selected:
+            return
+        index = selected[0]
+        del self.tasks[index]
+        self.update_task_listbox()
+
+    def update_task_listbox(self):
+        self.task_listbox.delete(0, tk.END)
+        for task in self.tasks:
+            display_text = f"[{task['completed']}/{task['est']}] {task['name']}"
+            self.task_listbox.insert(tk.END, display_text)
 
     def save_settings(self):
         try:
@@ -149,6 +230,16 @@ class Pomodoro:
             self.pomodoros_completed += 1
             self.progress_label.config(text=f"Pomodoros Completed: {self.pomodoros_completed}")
             
+            # Update selected task progress
+            selected = self.task_listbox.curselection()
+            if selected:
+                index = selected[0]
+                if 0 <= index < len(self.tasks):
+                    self.tasks[index]["completed"] += 1
+                    self.update_task_listbox()
+                    # Reselect the item after updating
+                    self.task_listbox.selection_set(index)
+
             if self.pomodoros_completed % 4 == 0:
                 self.current_phase = self.LONG_BREAK
                 messagebox.showinfo("Pomodoro Timer", "Work session complete! Take a long break.")

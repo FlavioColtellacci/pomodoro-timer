@@ -12,7 +12,8 @@ def mock_root():
 def pomodoro(mock_root):
     # Prevent setup_ui from creating real Tkinter widgets which need a real Tk instance
     with patch("tkinter.Frame"), patch("tkinter.Label"), patch("tkinter.Button"), \
-         patch("tkinter.Entry"), patch("tkinter.StringVar"):
+         patch("tkinter.Entry"), patch("tkinter.StringVar"), patch("tkinter.IntVar"), \
+         patch("tkinter.Spinbox"), patch("tkinter.Listbox"), patch("tkinter.Scrollbar"):
         app = Pomodoro(mock_root)
         return app
 
@@ -43,6 +44,7 @@ def test_reset_timer(pomodoro):
 def test_phase_transition_work_to_short_break(pomodoro):
     pomodoro.current_phase = Pomodoro.WORK
     pomodoro.pomodoros_completed = 0
+    pomodoro.task_listbox.curselection.return_value = ()
     
     with patch("tkinter.messagebox.showinfo") as mock_info:
         pomodoro.handle_phase_transition()
@@ -61,6 +63,7 @@ def test_phase_transition_short_break_to_work(pomodoro):
 def test_phase_transition_work_to_long_break(pomodoro):
     pomodoro.current_phase = Pomodoro.WORK
     pomodoro.pomodoros_completed = 3  # Next completion will be 4
+    pomodoro.task_listbox.curselection.return_value = ()
     
     with patch("tkinter.messagebox.showinfo") as mock_info:
         pomodoro.handle_phase_transition()

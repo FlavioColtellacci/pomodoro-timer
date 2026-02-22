@@ -1,0 +1,133 @@
+.task-view-container {
+    width: 100%;
+    max-width: 600px;
+    background-color: var(--card-bg);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.task-view-container h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #EFE6DD;
+}
+
+.add-task-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.add-task-form input[type="text"] {
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #5a5752;
+    background-color: var(--bg-color);
+    color: white;
+    font-family: var(--font-timer);
+    font-size: 1.1rem;
+}
+
+.est-input {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.est-input label {
+    color: var(--text-muted);
+}
+
+.est-input input {
+    padding: 10px;
+    width: 60px;
+    border-radius: 8px;
+    border: 1px solid #5a5752;
+    background-color: var(--bg-color);
+    color: white;
+    text-align: center;
+}
+
+.add-btn {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.add-btn:hover {
+    opacity: 0.9;
+}
+
+.empty-state {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.task-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bg-color);
+    padding: 15px 20px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    transition: border-color 0.2s ease;
+}
+
+.task-item.selected {
+    border-color: var(--accent);
+}
+
+.task-info {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.task-name {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.task-progress {
+    color: var(--text-muted);
+}
+
+.task-progress.muted {
+    opacity: 0.5;
+}
+
+.finish-btn {
+    background-color: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.finish-btn:hover {
+    background-color: var(--accent);
+    color: white;
+}
+
+.task-item.finished {
+    opacity: 0.7;
+}
